@@ -22,7 +22,7 @@
         "features": {
             "ghcr.io/devcontainers/features/node:1": {},
             "codex": {
-                "version": "0.145.0"
+                "version": "0.144.0"
             }
         }
     }

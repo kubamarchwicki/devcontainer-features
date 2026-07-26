@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 
-./check.sh 0.145.0
+./check.sh 0.144.0
