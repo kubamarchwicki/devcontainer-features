@@ -5,6 +5,18 @@
             "codex": {}
         }
     },
+    "alpine": {
+        "image": "alpine:3.23",
+        "features": {
+            "codex": {}
+        }
+    },
+    "amazonlinux": {
+        "image": "amazonlinux:2023",
+        "features": {
+            "codex": {}
+        }
+    },
     "existing-node": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
         "features": {
