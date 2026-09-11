@@ -74,6 +74,8 @@ The Feature always requests global, independent copies rather than symbolic link
 
 The Feature depends on `ghcr.io/devcontainers/features/node:1` for a current Node.js runtime and installs Git and CA certificates when Git is missing. It is tested on Ubuntu and the Debian-compatible Dev Containers base; overall operating-system support follows the standard Node Feature. The Git bootstrap recognizes `apt-get`, `apk`, and `dnf` when the Node dependency supports the selected base. Declaring the Node Feature separately with different options may cause the Dev Container CLI to install two Node Feature instances.
 
+Use a login name rather than a numeric UID for `remoteUser` or `containerUser`. The Agent Skills runner resolves either form, but the current standard Node Feature rejects numeric IDs before the Agent Skills Feature runs.
+
 Private sources require suitable credentials to be available during the image build. A bind mount or volume over the target home or skills directory can hide skills installed in the image.
 
 ## Local testing

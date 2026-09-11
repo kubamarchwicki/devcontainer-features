@@ -12,16 +12,24 @@ function configuredUser() {
         || 'root';
 }
 
-function passwdEntry(username) {
+function passwdEntry(configuredUser) {
+    const configuredUid = /^\d+$/.test(configuredUser) ? BigInt(configuredUser) : null;
     const entry = readFileSync('/etc/passwd', 'utf8')
         .split('\n')
-        .find((line) => line.split(':', 1)[0] === username);
+        .find((line) => {
+            const fields = line.split(':');
+            if (configuredUid !== null) {
+                return /^\d+$/.test(fields[2] ?? '') && BigInt(fields[2]) === configuredUid;
+            }
+            return fields[0] === configuredUser;
+        });
 
     if (!entry) {
-        throw new Error(`Configured container user does not exist: ${username}`);
+        throw new Error(`Configured container user does not exist: ${configuredUser}`);
     }
 
     const fields = entry.split(':');
+    const username = fields[0];
     const uid = Number(fields[2]);
     const gid = Number(fields[3]);
     const passwdHome = fields[5];
@@ -55,6 +63,11 @@ function assumeIdentity({ username, uid, gid }) {
 function writeChildOutput(result) {
     if (result.stdout) process.stdout.write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);
+}
+
+function reportsInstallFailures(output) {
+    return Array.from(output.matchAll(/\bFailed to install\s+(\d+)\b/gi))
+        .some((match) => BigInt(match[1]) > 0n);
 }
 
 function run() {
@@ -100,7 +113,7 @@ function run() {
         writeChildOutput(result);
         if (result.error) throw result.error;
         if (result.status !== 0) return result.status || 1;
-        if (/\bFailed to install\s+\d+\b/i.test(`${result.stdout ?? ''}\n${result.stderr ?? ''}`)) {
+        if (reportsInstallFailures(`${result.stdout ?? ''}\n${result.stderr ?? ''}`)) {
             throw new Error('The skills CLI reported one or more installation failures.');
         }
     }

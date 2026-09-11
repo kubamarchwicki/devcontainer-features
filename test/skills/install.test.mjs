@@ -24,19 +24,21 @@ function runRunner(options = {}) {
 printf '%s\\n' "$SKILLS_TEST_STDOUT"\n`);
     chmodSync(fakeNpx, 0o755);
 
+    const env = {
+        ...process.env,
+        PATH: `${fixture}:${process.env.PATH}`,
+        _REMOTE_USER: options.remoteUser ?? currentUser.username,
+        _CONTAINER_USER: options.containerUser ?? '',
+        _REMOTE_USER_HOME: fixture,
+        SOURCES: options.sources ?? '',
+        AGENTS: options.agents ?? 'codex,claude-code',
+        VERSION: options.version ?? '1.5.25',
+        SKILLS_TEST_CAPTURE: capture,
+        SKILLS_TEST_STDOUT: options.stdout ?? '',
+    };
     const result = spawnSync(process.execPath, [runner.pathname], {
         encoding: 'utf8',
-        env: {
-            ...process.env,
-            PATH: `${fixture}:${process.env.PATH}`,
-            _REMOTE_USER: currentUser.username,
-            _REMOTE_USER_HOME: fixture,
-            SOURCES: options.sources ?? '',
-            AGENTS: options.agents ?? 'codex,claude-code',
-            VERSION: options.version ?? '1.5.25',
-            SKILLS_TEST_CAPTURE: capture,
-            SKILLS_TEST_STDOUT: options.stdout ?? '',
-        },
+        env,
     });
 
     let captured = '';
@@ -74,6 +76,26 @@ test('does not invoke npx when sources is empty', () => {
     assert.equal(result.captured, '');
 });
 
+test('resolves a numeric remote user to its canonical passwd username', () => {
+    const result = runRunner({
+        sources: 'owner/repo',
+        remoteUser: String(currentUser.uid),
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.captured, new RegExp(`user=${currentUser.username}\\n`));
+    assert.match(result.captured, new RegExp(`logname=${currentUser.username}\\n`));
+});
+
+test('falls back to the configured container user', () => {
+    const result = runRunner({
+        sources: 'owner/repo',
+        remoteUser: '',
+        containerUser: currentUser.username,
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.captured, new RegExp(`user=${currentUser.username}\\n`));
+});
+
 test('rejects an empty agent list when sources are configured', () => {
     const result = runRunner({ sources: 'owner/repo', agents: ' , \t' });
     assert.equal(result.status, 1);
@@ -91,9 +113,18 @@ test('rejects a source that begins with a dash before invoking npx', () => {
 test('fails when the skills CLI reports an installation failure with exit status zero', () => {
     const result = runRunner({
         sources: 'owner/repo',
-        stdout: 'Failed to install 1 skill',
+        stdout: 'Failed to install 0001 skill',
     });
     assert.equal(result.status, 1);
-    assert.match(result.stdout, /Failed to install 1 skill/);
+    assert.match(result.stdout, /Failed to install 0001 skill/);
     assert.match(result.stderr, /^ERROR: .*reported/i);
+});
+
+test('does not fail when the skills CLI reports zero installation failures', () => {
+    const result = runRunner({
+        sources: 'owner/repo',
+        stdout: 'Failed to install 000 skills',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Failed to install 000 skills/);
 });
