@@ -1,0 +1,28 @@
+{
+    "id": "skills",
+    "name": "Agent Skills",
+    "version": "1.0.0",
+    "description": "Fetches and copies skills for configurable agents through the skills npm CLI.",
+    "documentationURL": "https://github.com/kubamarchwicki/devcontainer-features#agent-skills",
+    "licenseURL": "https://github.com/kubamarchwicki/devcontainer-features/blob/master/LICENSE",
+    "options": {
+        "sources": {
+            "type": "string",
+            "default": "",
+            "description": "Comma- or newline-separated skills CLI sources, such as owner/repo or owner/repo@skill-name. Empty installs no skills."
+        },
+        "agents": {
+            "type": "string",
+            "default": "codex,claude-code",
+            "description": "Comma- or whitespace-separated skills CLI agent IDs; use * for all supported agents."
+        },
+        "version": {
+            "type": "string",
+            "default": "latest",
+            "description": "npm version or tag for the skills CLI."
+        }
+    },
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/node:1": {}
+    }
+}

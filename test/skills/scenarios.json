@@ -1,0 +1,45 @@
+{
+    "root": {
+        "image": "ubuntu:24.04",
+        "features": {
+            "skills": {
+                "sources": "vercel-labs/skills@find-skills,\nvercel-labs/skills@find-skills"
+            }
+        }
+    },
+    "remote-user": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "remoteUser": "vscode",
+        "features": {
+            "skills": {
+                "sources": "vercel-labs/skills@find-skills"
+            }
+        }
+    },
+    "claude-only": {
+        "image": "ubuntu:24.04",
+        "features": {
+            "skills": {
+                "sources": "vercel-labs/skills@find-skills",
+                "agents": "claude-code",
+                "version": "1.5.25"
+            }
+        }
+    },
+    "whole-repository": {
+        "image": "ubuntu:24.04",
+        "features": {
+            "skills": {
+                "sources": "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278",
+                "agents": "codex",
+                "version": "1.5.25"
+            }
+        }
+    },
+    "default-empty": {
+        "image": "ubuntu:24.04",
+        "features": {
+            "skills": {}
+        }
+    }
+}
