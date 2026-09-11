@@ -36,6 +36,7 @@ printf '%s\\n' "$SKILLS_TEST_STDOUT"\n`);
         SKILLS_TEST_CAPTURE: capture,
         SKILLS_TEST_STDOUT: options.stdout ?? '',
     };
+    if (options.omitVersion) delete env.VERSION;
     const result = spawnSync(process.execPath, [runner.pathname], {
         encoding: 'utf8',
         env,
@@ -74,6 +75,12 @@ test('does not invoke npx when sources is empty', () => {
     const result = runRunner({ sources: ' ,\n ' });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.captured, '');
+});
+
+test('uses the latest CLI version when VERSION is not provided', () => {
+    const result = runRunner({ sources: 'owner/repo', omitVersion: true });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.captured, /arg=skills@latest\narg=skills\narg=add\n/);
 });
 
 test('resolves a numeric remote user to its canonical passwd username', () => {

@@ -3,8 +3,7 @@
         "image": "ubuntu:24.04",
         "features": {
             "skills": {
-                "sources": "vercel-labs/skills@find-skills,\nvercel-labs/skills@find-skills",
-                "version": "1.5.25"
+                "sources": "vercel-labs/skills@find-skills,\nvercel-labs/skills@find-skills"
             }
         }
     },
@@ -13,8 +12,7 @@
         "remoteUser": "vscode",
         "features": {
             "skills": {
-                "sources": "vercel-labs/skills@find-skills",
-                "version": "1.5.25"
+                "sources": "vercel-labs/skills@find-skills"
             }
         }
     },
@@ -41,9 +39,7 @@
     "default-empty": {
         "image": "ubuntu:24.04",
         "features": {
-            "skills": {
-                "version": "1.5.25"
-            }
+            "skills": {}
         }
     }
 }
