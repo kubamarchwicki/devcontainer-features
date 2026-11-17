@@ -1,7 +1,7 @@
 {
     "id": "plannotator",
     "name": "Plannotator",
-    "version": "1.0.0",
+    "version": "1.0.x",
     "description": "Installs the Plannotator binary at build time and configures its runtime environment.",
     "documentationURL": "https://github.com/kubamarchwicki/devcontainer-features#plannotator",
     "licenseURL": "https://github.com/kubamarchwicki/devcontainer-features/blob/master/LICENSE",

@@ -1,7 +1,7 @@
 {
     "id": "codex",
     "name": "Codex CLI",
-    "version": "1.0.0",
+    "version": "1.0.x",
     "description": "Installs the OpenAI Codex CLI globally via npm",
     "documentationURL": "https://github.com/kubamarchwicki/devcontainer-features#readme",
     "licenseURL": "https://github.com/kubamarchwicki/devcontainer-features/blob/main/LICENSE",

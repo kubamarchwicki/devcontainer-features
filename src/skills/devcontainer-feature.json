@@ -1,7 +1,7 @@
 {
     "id": "skills",
     "name": "Agent Skills",
-    "version": "1.0.0",
+    "version": "1.0.x",
     "description": "Fetches and copies skills for configurable agents through the skills npm CLI.",
     "documentationURL": "https://github.com/kubamarchwicki/devcontainer-features#agent-skills",
     "licenseURL": "https://github.com/kubamarchwicki/devcontainer-features/blob/master/LICENSE",

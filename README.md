@@ -46,6 +46,12 @@ Installs the Plannotator binary at build time. See the [Plannotator README](src/
 }
 ```
 
+## Versioning
+
+Each feature's `devcontainer-feature.json` holds a `major.minor.x` placeholder (e.g. `1.0.x`). Edit major and minor by hand when needed.
+
+On every release (push to `master`), the workflow replaces `x` with the next patch number after the highest one already published to GHCR for that `major.minor`. The new version is used for publishing only and is not committed back. Pin a feature to `:1`, `:1.0`, or an exact `:1.0.3`.
+
 ## License
 
 Licensed under the [MIT License](LICENSE).
