@@ -1,10 +1,12 @@
-# Codex and Agent Skills Dev Container Features
+# Dev Container Features
 
-A Dev Container Feature collection for installing the OpenAI Codex CLI and fetching agent skills into development containers.
+A collection of Dev Container Features for agent tooling.
 
-## Codex CLI
+## Features
 
-The target published reference is:
+### Codex
+
+Installs the OpenAI Codex CLI via npm. See the [Codex README](src/codex/README.md).
 
 ```json
 {
@@ -14,47 +16,13 @@ The target published reference is:
 }
 ```
 
-Pin an npm version, tag, or other npm selector with the `version` option:
+### Skills
+
+Fetches agent skills into the container user's agent directories. See the [Skills README](src/skills/README.md).
 
 ```json
 {
     "features": {
-        "ghcr.io/kubamarchwicki/devcontainer-features/codex:1": {
-            "version": "0.145.0"
-        }
-    }
-}
-```
-
-`version` defaults to `latest` and is passed to npm without Feature-level validation.
-
-### Node.js bootstrap
-
-If both `node` and `npm` already exist, the Feature reuses them. If either is missing, it installs the distribution's `nodejs` and `npm` packages through `apt-get`, `apk`, or `dnf`.
-
-The Feature uses configured distribution repositories. It does not add NodeSource or pin a Node.js major. If a consumer already declares `ghcr.io/devcontainers/features/node`, soft ordering installs that Feature first.
-
-The Feature does not install a separate distribution copy of `ripgrep`; runtime resources bundled by the selected `@openai/codex` package remain package-owned.
-
-### Security, state, and authentication
-
-The Feature installs only the Codex CLI. It does not:
-
-- mount or copy `~/.codex` or `CODEX_HOME`;
-- configure API keys or perform login;
-- install an editor extension;
-- request privileged mode, capabilities, or security options.
-
-Authenticate at runtime using the Codex CLI or your own environment and secret-management setup.
-
-## Agent Skills
-
-The Agent Skills Feature uses the [`skills` CLI](https://github.com/vercel-labs/skills#readme) to fetch skills during the image build and copy them into the configured container user's global agent directories. A complete configuration can install Codex and skills together:
-
-```json
-{
-    "features": {
-        "ghcr.io/kubamarchwicki/devcontainer-features/codex:1": {},
         "ghcr.io/kubamarchwicki/devcontainer-features/skills:1": {
             "sources": "vercel-labs/skills@find-skills,vercel-labs/agent-skills@web-design-guidelines",
             "agents": "codex,claude-code"
@@ -63,23 +31,9 @@ The Agent Skills Feature uses the [`skills` CLI](https://github.com/vercel-labs/
 }
 ```
 
-The options are:
+### Plannotator
 
-- `sources` defaults to an empty string, which installs no skills. Separate sources with commas or newlines. Use `owner/repo` to select every skill in a repository or `owner/repo@skill-name` to select one skill. Repository and tree URLs, including URLs pinned to a source revision, are passed through unchanged.
-- `agents` defaults to `codex,claude-code`. Separate agent IDs with commas or whitespace, or use `*` for every agent supported by the CLI. See the [`skills` README](https://github.com/vercel-labs/skills#readme) for current agent IDs and source formats.
-- `version` defaults to `latest` and selects the npm version or tag of the `skills` CLI. This is separate from any revision pinned in a skill source.
-
-The Feature always requests global, independent copies rather than symbolic links. The CLI owns destination mapping; with `skills@1.5.25`, Codex receives copies in `~/.agents/skills` and Claude Code in `~/.claude/skills`. It installs into the build-time remote user's home and sets ownership for that user. Rebuild the container to apply configuration changes.
-
-The Feature depends on `ghcr.io/devcontainers/features/node:1` for a current Node.js runtime and installs Git and CA certificates when Git is missing. It is tested on Ubuntu and the Debian-compatible Dev Containers base; overall operating-system support follows the standard Node Feature. The Git bootstrap recognizes `apt-get`, `apk`, and `dnf` when the Node dependency supports the selected base. Declaring the Node Feature separately with different options may cause the Dev Container CLI to install two Node Feature instances.
-
-Use a login name rather than a numeric UID for `remoteUser` or `containerUser`. The Agent Skills runner resolves either form, but the current standard Node Feature rejects numeric IDs before the Agent Skills Feature runs.
-
-Private sources require suitable credentials to be available during the image build. A bind mount or volume over the target home or skills directory can hide skills installed in the image.
-
-## Plannotator
-
-The Plannotator Feature installs the [Plannotator](https://plannotator.ai/) binary during the image build, so it is cached in the image layer instead of being installed in `onCreateCommand`. It runs the official installer with `--minimal` (binary only, no per-agent integrations) and places the binary in `/usr/local/lib/plannotator`, with a wrapper at `/usr/local/bin/plannotator`.
+Installs the Plannotator binary at build time. See the [Plannotator README](src/plannotator/README.md).
 
 ```json
 {
@@ -92,26 +46,6 @@ The Plannotator Feature installs the [Plannotator](https://plannotator.ai/) bina
 }
 ```
 
-| Option | Environment variable | Default |
-| --- | --- | --- |
-| `version` (release tag or `latest`) | | `latest` |
-| `remote` | `PLANNOTATOR_REMOTE` | `1` |
-| `agentTerminalRemote` | `PLANNOTATOR_AGENT_TERMINAL_REMOTE` | `1` |
-| `port` | `PLANNOTATOR_PORT` | `19432` |
-| `urlHost` | `PLANNOTATOR_URL_HOST` | `localhost` |
+## License
 
-An empty option leaves the variable unset. The wrapper applies these values as defaults only, so a variable already set in the container environment (for example through `containerEnv`) takes precedence. Option values may contain only letters, digits, and `._:/@-`.
-
-## Local testing
-
-With Docker and the Dev Container CLI installed:
-
-```sh
-devcontainer features test --project-folder . --features codex --skip-autogenerated
-devcontainer features test --project-folder . --features skills --skip-autogenerated
-devcontainer features test --project-folder . --features plannotator --skip-autogenerated
-```
-
-The Codex matrix covers `ubuntu:24.04`, `alpine:3.23`, `amazonlinux:2023`, and the standard Node Feature on the current Docker architecture. The Agent Skills matrix covers root and non-root installation, default and overridden agents, selected skills, whole repositories, repeated installation, and empty configuration. The root, remote-user, and empty scenarios omit `version` to exercise the `latest` default; the Claude-only and whole-repository scenarios pin the CLI version.
-
-The project is licensed under the [MIT License](LICENSE).
+Licensed under the [MIT License](LICENSE).
