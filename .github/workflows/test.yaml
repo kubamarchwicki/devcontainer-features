@@ -15,6 +15,7 @@ jobs:
         features:
           - codex
           - skills
+          - plannotator
     steps:
       - uses: actions/checkout@v4
 

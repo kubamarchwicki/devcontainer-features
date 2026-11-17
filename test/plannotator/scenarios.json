@@ -1,0 +1,18 @@
+{
+    "defaults": {
+        "image": "ubuntu:24.04",
+        "features": {
+            "plannotator": {}
+        }
+    },
+    "custom": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "plannotator": {
+                "port": "20000",
+                "urlHost": "example.test",
+                "remote": ""
+            }
+        }
+    }
+}
