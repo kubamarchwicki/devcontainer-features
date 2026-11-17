@@ -21,6 +21,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Major/minor are maintained by hand in devcontainer-feature.json.
+      # The patch is derived from what is already published to GHCR, so every
+      # release run gets a fresh version (the publish action skips existing ones).
+      - name: "Auto-increment patch version"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          for f in src/*/devcontainer-feature.json; do
+            name="$(basename "$(dirname "$f")")"
+            image="${owner}/${repo}/${name}"
+            current="$(jq -r '.version' "$f")"
+            prefix="${current%.*}"   # major.minor
+
+            token="$(curl -fsS -u "${GITHUB_ACTOR}:${GH_TOKEN}" \
+              "https://ghcr.io/token?scope=repository:${image}:pull" | jq -r '.token')"
+            tags="$(curl -sS -H "Authorization: Bearer ${token}" \
+              "https://ghcr.io/v2/${image}/tags/list" | jq -r '.tags[]? // empty')"
+
+            latest="$(printf '%s\n' "$tags" | grep -E "^${prefix//./\\.}\.[0-9]+$" | sort -V | tail -n1 || true)"
+            if [ -n "$latest" ]; then
+              next="${prefix}.$(( ${latest##*.} + 1 ))"
+            else
+              next="${prefix}.0"
+            fi
+
+            echo "${name}: ${current} -> ${next} (latest published: ${latest:-none})"
+            jq --arg v "$next" '.version = $v' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+          done
+
       - name: "Publish Features"
         uses: devcontainers/action@v1
         with:
