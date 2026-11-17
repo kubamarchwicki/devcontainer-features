@@ -1,0 +1,35 @@
+{
+    "id": "plannotator",
+    "name": "Plannotator",
+    "version": "1.0.0",
+    "description": "Installs the Plannotator binary at build time and configures its runtime environment.",
+    "documentationURL": "https://github.com/kubamarchwicki/devcontainer-features#plannotator",
+    "licenseURL": "https://github.com/kubamarchwicki/devcontainer-features/blob/master/LICENSE",
+    "options": {
+        "version": {
+            "type": "string",
+            "default": "latest",
+            "description": "Plannotator release tag, such as v0.17.2, or latest."
+        },
+        "remote": {
+            "type": "string",
+            "default": "1",
+            "description": "Default for PLANNOTATOR_REMOTE. Empty leaves it unset."
+        },
+        "agentTerminalRemote": {
+            "type": "string",
+            "default": "1",
+            "description": "Default for PLANNOTATOR_AGENT_TERMINAL_REMOTE. Empty leaves it unset."
+        },
+        "port": {
+            "type": "string",
+            "default": "19432",
+            "description": "Default for PLANNOTATOR_PORT. Empty leaves it unset."
+        },
+        "urlHost": {
+            "type": "string",
+            "default": "localhost",
+            "description": "Default for PLANNOTATOR_URL_HOST. Empty leaves it unset."
+        }
+    }
+}

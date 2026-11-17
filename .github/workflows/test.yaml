@@ -1,20 +1,61 @@
 name: "CI - Test Features"
 on:
-  push:
-    branches:
-      - master
   pull_request:
   workflow_dispatch:
+  # Called by release.yaml so every feature is tested before publishing.
+  workflow_call:
 
 jobs:
-  test-scenarios:
+  changes:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    outputs:
+      features: ${{ steps.select.outputs.features }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Detect changed features"
+        id: filter
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            codex:
+              - 'src/codex/**'
+              - 'test/codex/**'
+            skills:
+              - 'src/skills/**'
+              - 'test/skills/**'
+            plannotator:
+              - 'src/plannotator/**'
+              - 'test/plannotator/**'
+            workflows:
+              - '.github/workflows/test.yaml'
+
+      - name: "Select features to test"
+        id: select
+        env:
+          EVENT: ${{ github.event_name }}
+          CHANGED: ${{ steps.filter.outputs.changes }}
+          WORKFLOW_CHANGED: ${{ steps.filter.outputs.workflows }}
+        run: |
+          all='["codex","skills","plannotator"]'
+          # Pull requests test only changed features; every other trigger
+          # (release on master, manual runs) tests all of them.
+          if [ "${EVENT}" != "pull_request" ] || [ "${WORKFLOW_CHANGED}" = "true" ]; then
+            features="${all}"
+          else
+            features="$(printf '%s' "${CHANGED}" | jq -c 'map(select(. != "workflows"))')"
+          fi
+          echo "features=${features}" >> "$GITHUB_OUTPUT"
+
+  test-scenarios:
+    needs: changes
+    if: ${{ needs.changes.outputs.features != '[]' }}
+    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        features:
-          - codex
-          - skills
+        features: ${{ fromJSON(needs.changes.outputs.features) }}
     steps:
       - uses: actions/checkout@v4
 
